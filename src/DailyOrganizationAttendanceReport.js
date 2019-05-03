@@ -20,44 +20,44 @@ class DailyOrganizationAttendanceReport extends Component {
     var today = new Date();
     var today1 = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
     var companyType = CryptoJS.AES.decrypt(localStorage.getItem('CompanyType'), "shinchanbaby").toString(CryptoJS.enc.Utf8);
-       
-    if(companyType=="Office"){
-        companyType="Employee";
+
+    if (companyType == "Office") {
+      companyType = "Employee";
     }
-    else{
-        companyType="Student/Staff";
+    else {
+      companyType = "Student/Staff";
     }
     this.state = {
       date: today1,
       companyId: '',
       employeeId: '',
-      companyName:'',
-      companyType:companyType
+      companyName: '',
+      companyType: companyType
     };
   }
   componentDidMount() {
     var companyId = CryptoJS.AES.decrypt(localStorage.getItem('CompanyId'), "shinchanbaby").toString(CryptoJS.enc.Utf8)
     var employeeId = CryptoJS.AES.decrypt(localStorage.getItem('EmployeeId'), "shinchanbaby").toString(CryptoJS.enc.Utf8)
-   var companyName=CryptoJS.AES.decrypt(localStorage.getItem('CompanyName'), "shinchanbaby").toString(CryptoJS.enc.Utf8)
+    var companyName = CryptoJS.AES.decrypt(localStorage.getItem('CompanyName'), "shinchanbaby").toString(CryptoJS.enc.Utf8)
     this.state.companyId = companyId;
     this.state.employeeId = employeeId;
-    this.state.companyName=companyName;
+    this.state.companyName = companyName;
     this.setState({
       date: this.state.date,
       companyId: this.state.companyId,
       employeeId: this.state.employeeId,
-      companyName:this.state.CompanyName,
+      companyName: this.state.CompanyName,
     });
-report=this.state.CompanyName+"DailyReport"+this.state.date;
-var self=this;
+    report = this.state.CompanyName + "DailyReport" + this.state.date;
+    var self = this;
     $.ajax({
       type: 'POST',
       data: JSON.stringify({
-      date: this.state.date,
-      companyId: this.state.companyId,
-      employeeId: this.state.employeeId,
-  }),
-     //   url: "http://localhost:8080/EmployeeAttendenceAPI/EmployeeReport/employeeOrganizationAttendanceDailyReport",
+        date: this.state.date,
+        companyId: this.state.companyId,
+        employeeId: this.state.employeeId,
+      }),
+      //   url: "http://localhost:8080/EmployeeAttendenceAPI/EmployeeReport/employeeOrganizationAttendanceDailyReport",
       url: "https://wildfly.tictoks.com:443/EmployeeAttendenceAPI/EmployeeReport/employeeOrganizationAttendanceDailyReport",
       contentType: "application/json",
       dataType: 'json',
@@ -77,9 +77,9 @@ var self=this;
         var noOfTemporaryEmployee = 0;
         var status;
         var color;
-       // console.log("data",data);
+        // console.log("data",data);
         if (data.employeeRetrievelist.length != 0) {
-          var tab = '<thead><tr class="headcolor" style="color: white; background-color: #486885;" ><th>Id</th><th>Name</th><th>Dept</th><th>CheckIn</th><th>Location</th><th>CheckOut</th><th>Location</th></th><th>#WorkHour</th><th>Status</th><th>AuthorizedBy</th><th>Type</th></tr></thead>';
+          var tab = '<thead><tr class="headcolor" style="color: white; background-color: #486885;" ><th>Id</th><th>Name</th><th>Dept</th><th>CheckIn</th><th>Location</th><th>Reason</th><th>CheckOut</th><th>Location</th><th>Reason</th><th>#WorkHour</th><th>Status</th><th>AuthorizedBy</th><th>Type</th></tr></thead>';
           $.each(data.employeeRetrievelist, function (i, item) {
 
             if (item.employeeType == "Permanent") {
@@ -137,38 +137,48 @@ var self=this;
                 color = "#428bcab3";
               }
             }
-           // tab += '<tbody id= "myTable" ><tr style="background-color:' + color + ';" ><td>' + item.employeeId + '</td><td>' + item.name + '</td><td>' + item.department + '</td><td>' + item.employeeType + '</td><td>' + item.checkinTime + '</td><td>' + item.checkinLocation + '</td><td>' + item.checkoutTime + '</td><td>' + item.checkoutLocation + '</td><td>' + item.totalWorkHour + '</td><td>' + status + '</td><td>' + item.authorizedBy + '</td></tr></tbody>';
-           if(item.checkInOutTimings!=null){
-            tab += '<tbody id= "myTable" ><tr style="background-color:' + color + ';" ><td>' + item.employeeId + '</td><td>' + item.name + '</td><td>' + item.department + '</td><td>' + item.checkinTime + '</td><td>' + item.checkinLocation + '</td><td>' + item.checkoutTime + '</td><td>' + item.checkoutLocation + '</td><td>' + item.totalWorkHour + '</td><td>' + status + '</td><td>' + item.authorizedBy + '</td><td>' + item.employeeType + '</td></tr></tbody>';
-          
-            var str_array = item.checkInOutTimings.split(',');
-            var inOut='';
+            var checkInReason = item.checkInReason;
+            checkInReason = checkInReason.replace(/,-/g, "");
+            checkInReason = checkInReason.replace(/-,/g, "");
 
-        for(var i = 0; i < str_array.length; i+=2) {
-        
-         
-          if(str_array[i+1]){
-           
-            inOut+=str_array[i]+'&nbsp - &nbsp'+str_array[i+1]+'&nbsp&nbsp,&nbsp&nbsp';
-      }else{
-     
-        inOut+= str_array[i]+'&nbsp - &nbsp&nbsp -';
-     
-      }
-    }
-      tab+='<tbody id= "myTable" ><tr class="DetailReport" style="background-color:gray;"><td>'+item.employeeId +'</td><td colspan"2" style="text-align:center;"><font color="#fff">Check In/Out Details</font></td><td colspan="9" style="text-align:left;"><font color="#fff">'+inOut+'</font></td></tr></tbody>';
-      
-        
-          }else{
-              tab += '<tbody id= "myTable" ><tr  style="background-color:' + color + ';" ><td>' + item.employeeId + '</td><td>' + item.name + '</td><td>' + item.department + '</td><td>' + item.checkinTime + '</td><td>' + item.checkinLocation + '</td><td>' + item.checkoutTime + '</td><td>' + item.checkoutLocation + '</td><td>' + item.totalWorkHour + '</td><td>' + status + '</td><td>' + item.authorizedBy + '</td><td>' + item.employeeType + '</td></tr></tbody>';
-          
+            var checkOutReason = item.checkOutReason;
+            checkOutReason = checkOutReason.replace(/,-/g, "");
+            checkOutReason = checkOutReason.replace(/-,/g, "");
+
+            // tab += '<tbody id= "myTable" ><tr style="background-color:' + color + ';" ><td>' + item.employeeId + '</td><td>' + item.name + '</td><td>' + item.department + '</td><td>' + item.employeeType + '</td><td>' + item.checkinTime + '</td><td>' + item.checkinLocation + '</td><td>' + item.checkoutTime + '</td><td>' + item.checkoutLocation + '</td><td>' + item.totalWorkHour + '</td><td>' + status + '</td><td>' + item.authorizedBy + '</td></tr></tbody>';
+            if (item.checkInOutTimings != null) {
+              tab += '<tbody id= "myTable" ><tr style="background-color:' + color + ';" ><td>' + item.employeeId + '</td><td>' + item.name + '</td><td>' + item.department + '</td><td>' + item.checkinTime + '</td><td>' + item.checkinLocation + '</td><td>' + checkInReason + '</td><td>' + item.checkoutTime + '</td><td>' + item.checkoutLocation + '</td>><td>' + checkOutReason + '</td><td>' + item.totalWorkHour + '</td><td>' + status + '</td><td>' + item.authorizedBy + '</td><td>' + item.employeeType + '</td></tr></tbody>';
+
+              var str_array = item.checkInOutTimings.split(',');
+              var inOut = '';
+
+              for (var i = 0; i < str_array.length; i += 2) {
+
+
+                if (str_array[i + 1]) {
+
+                  inOut += str_array[i] + '&nbsp - &nbsp' + str_array[i + 1] + '&nbsp&nbsp,&nbsp&nbsp';
+                } else {
+
+                  inOut += str_array[i] + '&nbsp - &nbsp&nbsp -';
+
+                }
+              }
+              tab += '<tbody id= "myTable" ><tr class="DetailReport" style="background-color:gray;"><td>' + item.employeeId + '</td><td colspan"2" style="text-align:center;"><font color="#fff">Check In/Out Details</font></td><td colspan="11" style="text-align:left;"><font color="#fff">' + inOut + '</font></td></tr></tbody>';
+
+
+            } else {
+
+
+              tab += '<tbody id= "myTable" ><tr  style="background-color:' + color + ';" ><td>' + item.employeeId + '</td><td>' + item.name + '</td><td>' + item.department + '</td><td>' + item.checkinTime + '</td><td>' + item.checkinLocation + '</td><td>' + checkInReason + '</td><td>' + item.checkoutTime + '</td><td>' + item.checkoutLocation + '</td><td>' + checkOutReason + '</td><td>' + item.totalWorkHour + '</td><td>' + status + '</td><td>' + item.authorizedBy + '</td><td>' + item.employeeType + '</td></tr></tbody>';
+
             }
           });
           $("#tableHeadings").append(tab);
           $(".DetailReport").hide();
-         
-         
-          var summary = '<thead ><tr style="color: white; background-color: #486885;"  class="headcolor"><th>Type</th><th>#'+self.state.companyType+'</th><th>Present</th><th>Absent</th><th>Leave</th></tr></thead>';
+
+
+          var summary = '<thead ><tr style="color: white; background-color: #486885;"  class="headcolor"><th>Type</th><th>#' + self.state.companyType + '</th><th>Present</th><th>Absent</th><th>Leave</th></tr></thead>';
           summary += '<tbody id= "myTable" ><tr class="success" ><td> Permanent</td><td>' + noOfPermanentEmployee + '</td><td>' + permanentcountPresent + '</td><td>' + permanentcountAbsent + '</td><td>' + permanentcountLeave + '</td></tr></tbody>';
           summary += '<tbody id= "myTable" ><tr class="success" ><td> Contract</td><td>' + noOfContractEmployee + '</td><td>' + contractcountPresent + '</td><td>' + contractcountAbsent + '</td><td>' + contractcountLeave + '</td></tr></tbody>';
           summary += '<tbody id= "myTable" ><tr class="success" ><td> Temporary</td><td>' + noOfTemporaryEmployee + '</td><td>' + temporarycountPresent + '</td><td>' + temporarycountAbsent + '</td><td>' + temporarycountLeave + '</td></tr></tbody>';
@@ -176,7 +186,7 @@ var self=this;
           $("#summary").append(summary);
         } else {
           $("#tableHeadings").append('<h3 align="center">No Data</h3>');
-           $("#summary").hide();
+          $("#summary").hide();
         }
       },
       error: function (data) {
@@ -206,7 +216,6 @@ var self=this;
     ReactDOM.render(
       <Router>
         <div>
-
           <Route path="/" component={EmployeeMenuHeader} />
           <Route path="/" component={() => <DailyIndividualAttendanceReport />} />
           <Route path="/" component={FooterText} />
@@ -268,29 +277,29 @@ var self=this;
     }
   }
 
-  DetailReport(){
+  DetailReport() {
     $(".DetailReport").show();
   }
   render() {
 
     return (
 
-      <div className="container"id="containerbody" >
+      <div className="container" id="containerbody" >
 
-              <ul class="previous disabled" id="backbutton"
-                    style={{
-                        backgroundColor: "#f1b6bf",
-                        float: "none",
-                        display: "inline-block",
-                        marginLeft: "5px",
-                        borderRadius: "5px",
-                        padding: "3px 7px 3px 7px"
-                    }}>
-                    <a href="#" onClick={() => this.BackbtnFunc()}><i class="arrow left"></i></a></ul>
+        <ul class="previous disabled" id="backbutton"
+          style={{
+            backgroundColor: "#f1b6bf",
+            float: "none",
+            display: "inline-block",
+            marginLeft: "5px",
+            borderRadius: "5px",
+            padding: "3px 7px 3px 7px"
+          }}>
+          <a href="#" onClick={() => this.BackbtnFunc()}><i class="arrow left"></i></a></ul>
 
         <h3 className="centerAlign" style={{ textAlign: "center" }}>Daily Attendance Report</h3>
         <h4 className="centerAlign" style={{ textAlign: "center" }}>{this.state.date}</h4>
-  {/*       <div id='horMenu'>
+        {/*       <div id='horMenu'>
           <ul>
             <li><a className="active col-sm-6 col-xs-12 col-lg-6" onClick={() => this.MyReport()}><span class="glyphicon glyphicon-user">My Report</span></a></li>
             <li><a className="col-sm-6 col-xs-12 col-lg-6" onClick={() => this.OrganizationReport()}><span class="glyphicon glyphicon-th-large">Organization Report
@@ -298,16 +307,16 @@ var self=this;
           </ul>
         </div> */}
 
-         <div id='horMenunew' >
-          <ul id='horMenunew' style={{ backgroundColor: "#8811d6" ,padding: "10px 0px!important" }}>
-            <li><a style={{ padding: "10px 0px"}} className="active"   onClick={() => this.MyReport()} ><span class="glyphicon glyphicon-user">My Report</span></a></li>
-            <li><a  style={{ padding: "10px 0px"}}  onClick={() => this.OrganizationReport()}><span class="glyphicon glyphicon-th-large">Organization Report</span> </a></li>
+        <div id='horMenunew' >
+          <ul id='horMenunew' style={{ backgroundColor: "#8811d6", padding: "10px 0px!important" }}>
+            <li><a style={{ padding: "10px 0px" }} className="active" onClick={() => this.MyReport()} ><span class="glyphicon glyphicon-user">My Report</span></a></li>
+            <li><a style={{ padding: "10px 0px" }} onClick={() => this.OrganizationReport()}><span class="glyphicon glyphicon-th-large">Organization Report</span> </a></li>
           </ul>
 
         </div>
 
         <input style={{ color: "black" }} type="text" id="myInput" placeholder="Search.." title="Type in a name" />
-{/*}
+        {/*}
         <div id="tableOverflow" >
  <ReactHTMLTableToExcel
                     id="test-table-xls-button"
@@ -321,25 +330,25 @@ var self=this;
 
         </div>
       */}
-      
-        <div id="tableOverflow">
-         <h3 className="centerAlign" style={{ textAlign: "center" }}>Summary</h3>
 
-          <table class="table" id="summary" style={{ marginBottom: "2%",color:"black" }}>
+        <div id="tableOverflow">
+          <h3 className="centerAlign" style={{ textAlign: "center" }}>Summary</h3>
+
+          <table class="table" id="summary" style={{ marginBottom: "2%", color: "black" }}>
 
 
           </table>
 
         </div>
-<h3 className="centerAlign" style={{ textAlign: "center" }}>Detailed Report List</h3>
-<div  style={{paddingBottom:"6%",margin: "12px"}}>
-        <button  style={{float:"right"}}  onClick={() => this.DetailReport()} class="DetailReportSelect">Detailed Report</button>
-      </div>
-<div id="tableOverflow">
-         <table style={{ margin: "auto" ,marginBottom: "10%"}} class="table" id="tableHeadings">
+        <h3 className="centerAlign" style={{ textAlign: "center" }}>Detailed Report List</h3>
+        <div style={{ paddingBottom: "6%", margin: "12px" }}>
+          <button style={{ float: "right" }} onClick={() => this.DetailReport()} class="DetailReportSelect">Detailed Report</button>
+        </div>
+        <div id="tableOverflow">
+          <table style={{ margin: "auto", marginBottom: "10%" }} class="table" id="tableHeadings">
 
           </table>
-      </div>
+        </div>
       </div>
     );
   }

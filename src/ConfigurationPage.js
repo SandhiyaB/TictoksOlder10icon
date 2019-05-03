@@ -39,6 +39,7 @@ import MessageMenuPage from './MessageMenuPage';
 
 import EmailPage from './EmailPage';
 import PayRollConfigPage from './PayRollConfigPage';
+import WIFISettingPage from './WIFISettingPage';
 
 class ConfigurationPage extends Component {
 
@@ -48,6 +49,7 @@ class ConfigurationPage extends Component {
     var shiftSwitched = CryptoJS.AES.decrypt(localStorage.getItem('ShiftMode'), "shinchanbaby").toString(CryptoJS.enc.Utf8);
     var superiorId = CryptoJS.AES.decrypt(localStorage.getItem('EmployeeId'), "shinchanbaby").toString(CryptoJS.enc.Utf8);
     var sms = CryptoJS.AES.decrypt(localStorage.getItem('SMS'), "shinchanbaby").toString(CryptoJS.enc.Utf8);
+    var wifiSetting = CryptoJS.AES.decrypt(localStorage.getItem('WifiSetting'), "shinchanbaby").toString(CryptoJS.enc.Utf8);
 
     if (shiftSwitched == 0) {
       shiftSwitched = false;
@@ -64,6 +66,11 @@ class ConfigurationPage extends Component {
     } else {
       sms = true;
     }
+    if (wifiSetting == 0) {
+      wifiSetting = false;
+    } else {
+      wifiSetting = true;
+    }
     this.state = {
       date: '',
       shift: '1',
@@ -79,6 +86,9 @@ class ConfigurationPage extends Component {
       shiftSwitched: shiftSwitched,
       superiorId: superiorId,
       sms: sms,
+      wifiSetting: wifiSetting,
+      ssid:'',
+      wifiPassword:'',
 
     }
   }
@@ -644,11 +654,96 @@ class ConfigurationPage extends Component {
     }
 
   };
+  toggleWifiSetting() {
+
+    if (this.state.wifiSetting == 0) {
+      this.state.wifiSetting = 1;
+
+      this.setState({
+        wifiSetting: 1,
+      })
+
+      $("#ssid").attr("checked", false);
+    } else {
+      this.state.wifiSetting = 0;
+
+      this.setState({
+        wifiSetting: 0,
+      })
+
+    }
+
+    if (this.state.wifiSetting == 1) {
+      ReactDOM.render(
+        <Router>
+          <div>
+            <Route path="/" component={EmployeeMenuHeader} />
+            <Route path="/" component={WIFISettingPage} />
+            <Route path="/" component={FooterText} />
+
+          </div>
+        </Router>,
+        document.getElementById('root'));
+      registerServiceWorker();
+
+    } else {
+      var companyId = CryptoJS.AES.decrypt(localStorage.getItem('CompanyId'), "shinchanbaby").toString(CryptoJS.enc.Utf8)
+      var switchdata = this.state.shiftSwitched;
+
+      this.state.companyId = companyId;
+      this.state.hours = "0";
+      this.setState({
+        companyId: this.state.companyId,
+        hours: this.state.hours,
+        shiftSwitched: this.state.shiftSwitched,
+        superiorId: this.state.superiorId,
+      })
+      var self = this;
+      $.ajax({
+        type: 'POST',
+        data: JSON.stringify({
+          companyId: this.state.companyId,
+          wifiSetting: this.state.wifiSetting,
+          ssid: this.state.ssid,
+          superiorId: this.state.superiorId,
+          wifiPassword:this.state.wifiPassword
+        }),
+          url: "https://wildfly.tictoks.com:443/EmployeeAttendenceAPI/EmployeeConfig/updateWifiSetting",
+        //url: "http://localhost:8080/EmployeeAttendenceAPI/EmployeeConfig/updateWifiSetting",
+        contentType: "application/json",
+        dataType: 'json',
+        async: false,
+
+        success: function (data, textStatus, jqXHR) {
+          self.state.shiftSwitched = 0,
+            self.setState({
+              wifiSetting: self.state.wifiSetting,
+            });
+            localStorage.setItem('WifiSetting', CryptoJS.AES.encrypt("0", "shinchanbaby"));
+
+        },
+        error: function (data) {
+          confirmAlert({
+            title: 'No Internet',                        // Title dialog
+            message: 'Network Connection Problem',               // Message dialog
+            confirmLabel: 'Ok',                           // Text button confirm
+          });
+
+
+        }
+
+      });
+
+
+    }
+
+  };
+
   DeviceConfig() {
 
   }
 
-  PayRoll(){
+  PayRoll() {
     ReactDOM.render(
       <Router>
         <div>
@@ -665,7 +760,6 @@ class ConfigurationPage extends Component {
   }
 
   render() {
-
 
     return (
 
@@ -736,6 +830,10 @@ class ConfigurationPage extends Component {
                   <td>Strict Mode</td>
                   <td><Switch id="mode" onClick={() => this.toggleShiftMode()} on={this.state.shiftSwitched} /> </td>
                 </tr>
+                <tr>
+                  <td>Wi-Fi Setting</td>
+                  <td><Switch id="ssid" onClick={() => this.toggleWifiSetting()} on={this.state.wifiSetting} /> </td>
+                </tr>
 
                 <tr>
 
@@ -763,7 +861,7 @@ class ConfigurationPage extends Component {
                 */} <tr>
 
                   <td>SMS</td>
-                  <td> <Switch onClick={this.SmsChange} on={this.state.sms} />
+                  <td> <Switch onClick={() => this.SmsChange()}/* onClick={this.SmsChange} */ on={this.state.sms} />
                   </td>
                 </tr>
                 {/* <tr>
@@ -774,7 +872,7 @@ class ConfigurationPage extends Component {
                 <tr>
 
                   <td>Biometric-Enable</td>
-                  <td> <Switch onClick={this.biometricChange} on={this.state.biometric} />
+                  <td> <Switch onClick={() => this.biometricChange()} /* onClick={this.biometricChange} */ on={this.state.biometric} />
                   </td>
                 </tr>
               </tbody>

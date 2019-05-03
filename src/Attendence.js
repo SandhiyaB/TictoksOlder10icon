@@ -1057,6 +1057,38 @@ class Attendence extends Component {
         // window.location = 'geo:40.765819,-73.975866';
 
     }
+    PdfMail(){
+        $.ajax({
+            type: 'POST',
+            data: JSON.stringify({
+             
+            }),
+            // url: "https://wildfly.tictoks.com:443/EmployeeAttendenceAPI/payslip/OrganizationPaySlip",
+            url: "http://localhost:8080/EmployeeAttendenceAPI/testpdf/PDFMAIL",
+            contentType: "application/json",
+            dataType: 'json',
+            async: false,
+            crossDomain: true,
+      
+            success: function (data, textStatus, jqXHR) {
+      
+              console.log("DATA LENGTH :", data);
+      
+            },
+            error: function (data) {
+                confirmAlert({
+                  title: 'No Internet',                        // Title dialog
+                  message: 'Network Connection Problem',               // Message dialog
+                  confirmLabel: 'Ok',                           // Text button confirm
+                });
+        
+        
+              },
+
+          });
+
+
+    }
     render() {
         return (
 
@@ -1114,7 +1146,12 @@ class Attendence extends Component {
                     {/*  <button onClick={() => this.Submit()} style={{marginLeft:"5px"}} id="submit">Submit</button>
                    */}
                 </div>
-            </div>
+            {/*     <div className="col-sm-4 col-md-4 col-xs-4 " id="imgwidth">
+        
+                  <a to="/" onClick={() => this.PdfMail()} id="attendance" className="">
+                    Test_PDF_MAIL</a>
+                </div>
+             */}</div>
 
         );
     }

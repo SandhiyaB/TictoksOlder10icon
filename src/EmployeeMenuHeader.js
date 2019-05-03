@@ -409,7 +409,9 @@ class EmployeeMenuHeader extends Component {
 					localStorage.setItem('ShiftMode', CryptoJS.AES.encrypt(data.shiftMode.toString(), key));
 					localStorage.setItem('CompanyType', CryptoJS.AES.encrypt(data.companyType, key));
 					localStorage.setItem('SMS', CryptoJS.AES.encrypt(data.sms.toString(), key));
+					localStorage.setItem('WifiSetting', CryptoJS.AES.encrypt(data.wifiSetting, key));
 					localStorage.setItem('SalarySelectionOption', CryptoJS.AES.encrypt(data.salarySelectionOption, key));
+				
 				
 				}
 			},
