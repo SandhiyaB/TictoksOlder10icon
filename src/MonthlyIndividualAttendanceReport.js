@@ -19,6 +19,7 @@ import MonthlyAttendanceReportDisplay from './MonthlyAttendanceReportDisplay';
 import { confirmAlert } from 'react-confirm-alert';
 import EmployeeMenuHeader from './EmployeeMenuHeader';
 import FooterText from './FooterText';
+import MonthlyReportShort from './MonthlyReportShort ';
 
 var i;
 
@@ -85,43 +86,43 @@ class MonthlyIndividualAttendanceReport extends Component {
         fromDate: this.state.fromDate,
         toDate: this.state.toDate,
       });
-    }  else if (value == ("02")) {
+    } else if (value == ("02")) {
       if (today.getFullYear() % 100 == 0 && today.getFullYear() % 400 == 0 && today.getFullYear() % 4 == 0) {
         var j = (i - 1);
         if (j == val1) {
           this.state.fromDate = today.getFullYear() + '-' + val1 + '-' + '01';
           this.state.toDate = today.getFullYear() + '-' + val1 + '-' + today.getDate();
-           this.state.month=value;
+          this.state.month = value;
         } else {
 
           this.state.fromDate = today.getFullYear() + '-' + value + '-' + '01';
           this.state.toDate = today.getFullYear() + '-' + value + '-' + '29';
-           this.state.month=value;
+          this.state.month = value;
         }
         this.setState({
           fromDate: this.state.fromDate,
           toDate: this.state.toDate,
-          month:this.state.month,
+          month: this.state.month,
         });
 
       }
       else {
 
-      var j = (i - 1);
-          if (j == val1) {
+        var j = (i - 1);
+        if (j == val1) {
           this.state.fromDate = today.getFullYear() + '-' + val1 + '-' + '01';
           this.state.toDate = today.getFullYear() + '-' + val1 + '-' + today.getDate();
-           this.state.month=value;
-        }else{
-        this.state.fromDate = today.getFullYear() + '-' + value + '-' + '01';
-        this.state.toDate = today.getFullYear() + '-' + value + '-' + '28';
-         this.state.month=value;
-      }
-      this.setState({
-        fromDate: this.state.fromDate,
-        toDate: this.state.toDate,
-        month:this.state.month,
-      });
+          this.state.month = value;
+        } else {
+          this.state.fromDate = today.getFullYear() + '-' + value + '-' + '01';
+          this.state.toDate = today.getFullYear() + '-' + value + '-' + '28';
+          this.state.month = value;
+        }
+        this.setState({
+          fromDate: this.state.fromDate,
+          toDate: this.state.toDate,
+          month: this.state.month,
+        });
 
       }
 
@@ -157,10 +158,10 @@ class MonthlyIndividualAttendanceReport extends Component {
         ReactDOM.render(
           <Router>
             <div>
-             
+
               <Route path="/" component={() => <MonthlyIndividualAttendanceReportDisplay data={data} />} />
 
-</div>
+            </div>
           </Router>,
           document.getElementById('root'));
         registerServiceWorker();
@@ -208,11 +209,11 @@ class MonthlyIndividualAttendanceReport extends Component {
     ReactDOM.render(
       <Router>
         <div>
-         
-         
+
+
           <Route path="/" component={() => <MonthlyIndividualAttendanceReport />} />
 
-</div>
+        </div>
       </Router>,
       document.getElementById('root'));
     registerServiceWorker();
@@ -235,11 +236,42 @@ class MonthlyIndividualAttendanceReport extends Component {
       ReactDOM.render(
         <Router>
           <div>
+            <Route path="/" component={() => <MonthlyReportShort />} />
+          </div>
+        </Router>,
+        document.getElementById('root'));
+      registerServiceWorker();
+    } else {
+      confirmAlert({
+        title: 'Access Deined',                        // Title dialog
+        message: 'You are not Allowed to Access this Page',               // Message dialog
+        confirmLabel: 'Ok',                           // Text button confirm
 
-         
-           <Route path="/" component={() => <MonthlyOrganizationAttendanceReport />} />
-         
-         
+      })
+    }
+  }
+  OrganizationDetailedReport() {
+    var permission = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem('Permissions'), "shinchanbaby").toString(CryptoJS.enc.Utf8));
+
+    var flag = 1;//false
+    var i = permission.length;
+    $.each(permission, function (i, item) {
+
+      if (item.permission == "report") {
+        flag = 0;//true
+      }
+    });
+
+
+    if (flag == 0) {
+      ReactDOM.render(
+        <Router>
+          <div>
+
+
+            <Route path="/" component={() => <MonthlyOrganizationAttendanceReport />} />
+
+
           </div>
         </Router>,
         document.getElementById('root'));
@@ -257,9 +289,9 @@ class MonthlyIndividualAttendanceReport extends Component {
     ReactDOM.render(
       <Router>
         <div>
-         
+
           <Route path="/" component={ReportMenuPage} />
-        
+
         </div>
       </Router>,
       document.getElementById('root'));
@@ -292,9 +324,10 @@ class MonthlyIndividualAttendanceReport extends Component {
         </div> */}
 
         <div id='horMenunew' >
-          <ul id='horMenunew'  class="ulmenubar"  style={{ backgroundColor: "#8811d6", padding: "10px 0px!important" }}>
+          <ul id='horMenunew' class="ulmenubar" style={{ backgroundColor: "#8811d6", padding: "10px 0px!important" }}>
             <li><a style={{ padding: "10px 0px" }} className="active" onClick={() => this.MyReport()} ><span class="glyphicon glyphicon-user"></span>My Report</a></li>
             <li><a style={{ padding: "10px 0px" }} onClick={() => this.OrganizationReport()}><span class="glyphicon glyphicon-th-large"></span>Organization Report </a></li>
+            <li><a style={{ padding: "10px 0px" }} onClick={() => this.OrganizationDetailedReport()}><span class="glyphicon glyphicon-th-large"></span>Organization Detailed Report </a></li>
           </ul>
 
         </div>

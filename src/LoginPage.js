@@ -233,8 +233,8 @@ window.scrollTo(0, 0);
 					localStorage.setItem('CompanyType', CryptoJS.AES.encrypt(data.companyType, key));
 					localStorage.setItem('SMS', CryptoJS.AES.encrypt(data.sms.toString(), key));
 					localStorage.setItem('PlanName', CryptoJS.AES.encrypt(data.planName, key));
+					localStorage.setItem('WifiSetting', CryptoJS.AES.encrypt(data.wifiSetting, key));
 					localStorage.setItem('SalarySelectionOption', CryptoJS.AES.encrypt(data.salarySelectionOption, key));
-					
 				
 					ReactDOM.render(
 						<Router>
